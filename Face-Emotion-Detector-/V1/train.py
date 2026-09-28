@@ -1,29 +1,27 @@
 from pathlib import Path
 
 from loguru import logger
-from tqdm import tqdm
 import typer
 
-from V1.config import MODELS_DIR, PROCESSED_DATA_DIR
+from V1.config import RAW_DATA_DIR
+from V1.dataset import load_and_flatten_dataset
+from V1.modeling.backward import backward_propagation
+from V1.modeling.forward import forward_propagation
+from V1.modeling.loss import calc_cost
+from V1.modeling.update import update_parames
 
 app = typer.Typer()
 
 
 @app.command()
 def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    features_path: Path = PROCESSED_DATA_DIR / "features.csv",
-    labels_path: Path = PROCESSED_DATA_DIR / "labels.csv",
-    model_path: Path = MODELS_DIR / "model.pkl",
-    # -----------------------------------------
+    input_dir: Path = RAW_DATA_DIR / "train",
 ):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Training some model...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Modeling training complete.")
-    # -----------------------------------------
+    X_train, y_train, label_map = load_and_flatten_dataset(input_dir)
+
+    logger.info(f"Training features shape: {X_train.shape}")
+    logger.info(f"Training labels shape: {y_train.shape}")
+    logger.info(f"Number of classes: {len(label_map)}")
 
 
 if __name__ == "__main__":
