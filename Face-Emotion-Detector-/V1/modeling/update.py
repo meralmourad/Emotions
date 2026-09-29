@@ -1,12 +1,12 @@
-from numpy import copy
+from copy import deepcopy
 
-def update_parames(parames , grades , learrning_rate):
+def update_parames(parameters, grades, learning_rate):
 
-    parameters = copy.deepcopy(parames)
-    L = parameters // 2 
+    updated_parameters = deepcopy(parameters)
+    layer_count = len(parameters) // 2
 
-    for l in range(L):
-        parames['W' + str(l)] -= grades['dW' + str(l)] * learrning_rate
-        parames['b' + str(l)] -= grades['db' + str(l)] * learrning_rate
+    for layer in range(1, layer_count + 1):
+        updated_parameters['W' + str(layer)] -= grades['dW' + str(layer)] * learning_rate
+        updated_parameters['b' + str(layer)] -= grades['db' + str(layer)] * learning_rate
 
-    return parameters 
+    return updated_parameters

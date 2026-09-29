@@ -1,30 +1,21 @@
-from pathlib import Path
-
+from .modeling.forward import forward_propagation
+import numpy as np
 from loguru import logger
-from tqdm import tqdm
 import typer
 
-from V1.config import MODELS_DIR, PROCESSED_DATA_DIR
 
-app = typer.Typer()
+def predict(X, Y, parameters):
+    X = np.asarray(X)
+    Y = np.asarray(Y).reshape(-1)
 
+    layer_count = len(parameters) // 2
+    class_count = parameters['W' + str(layer_count)].shape[0]
+    probabilities, _ = forward_propagation(X.T, class_count, parameters)
+    predictions = np.argmax(probabilities, axis=0)
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    features_path: Path = PROCESSED_DATA_DIR / "test_features.csv",
-    model_path: Path = MODELS_DIR / "model.pkl",
-    predictions_path: Path = PROCESSED_DATA_DIR / "test_predictions.csv",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Performing inference for model...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Inference complete.")
-    # -----------------------------------------
+    if predictions.shape != Y.shape:
+        raise ValueError("The number of input samples and labels must match.")
 
-
-if __name__ == "__main__":
-    app()
+    accuracy = np.mean(predictions == Y)
+    logger.info(f"Prediction accuracy: {accuracy:.2%}")
+    return predictions

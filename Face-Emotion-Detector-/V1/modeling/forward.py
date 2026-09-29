@@ -1,4 +1,5 @@
 import numpy as np
+from copy import deepcopy
 from .activation import softmax, relu
 
 def linear_forward(W , b , A_prev):
@@ -29,7 +30,8 @@ def forward_propagation(X, C, parameters):
     
     A = X
     caches = [] 
-    L_layers = parameters //2 
+    updated_parameters = deepcopy(parameters)
+    L_layers = len(parameters) // 2
 
     for l in range(1 , L_layers):
         A_prev = A
